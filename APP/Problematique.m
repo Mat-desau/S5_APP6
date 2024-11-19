@@ -74,16 +74,19 @@ Position = struct("Y", Hauteur_mes, "X", Position_mes, "Erreur", Erreur);
 
 clear Vitesse_mes h acc_mes t Hauteur_mes Position_mes Erreur
 
-%Affichage des approximations
-figure
-title("Vitesse")
-scatter(Vitesse.X,Vitesse.Y)
-grid on
+%% Identification p0 et hs
 
-figure
-title("Position")
-scatter(Position.X,Position.Y)
-grid on
+
+%Affichage des approximations
+% figure
+% title("Vitesse")
+% scatter(Vitesse.X,Vitesse.Y)
+% grid on
+% 
+% figure
+% title("Position")
+% scatter(Position.X,Position.Y)
+% grid on
 
 % À identifier
 % RO_0
