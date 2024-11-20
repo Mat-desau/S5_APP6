@@ -88,52 +88,55 @@ Position = struct("Y", h_mes, "X", t_h_mes, "Erreur", Erreur);
 %% Identification p0 et hs
 %Moindre Carrer
 C = [ones(length(h_mes),1), h_mes];
-Y = log((2*acc_mes(1:2:55))./(vit_mes(1:2:55)).^2);
-A = pinv(C)*Y
+Y = log((2*acc_mes(1:2:end))./(vit_mes(1:2:end)).^2);
+A = pinv(C)*Y;
 
 %Voir calculs à la main sur comment on a trouver
 
 %Identification des paramètres manquant
-p0 = (m.*exp(A(1)))./(S.*C_D0)
-hs = -1./A(2)
+p0 = (m.*exp(A(1)))./(S.*C_D0);
+hs = -1./A(2);
 
 %Approximation de l'accélération
-acc_appro = (((0.5 * p0 * S * C_D0) .* exp(-h_mes/hs)) .* vit_mes(1:2:55).^2 )./m
+acc_appro = (0.5 * p0 * S * C_D0 .* exp(-h_mes/hs) .* vit_mes(1:2:end).^2)/m;
 
-%Graphique approximer avec le vrai
-figure
-hold on
-scatter(t, acc_mes, "red")
-scatter(t_h_mes, acc_appro, "blue")
-
-
-%coeficient R2
-
-%erreur RMS approx
-
-%Erreur absolue
-
-%Erreur relatives
-
-
-
-
-
-
-
-
-
-%Affichage des approximations
+%Graphique Acceleration approx vs mesurer
 % figure
+% hold on
+% scatter(t, acc_mes, "red")
+% plot(t_h_mes, acc_appro, "blue")
+% grid on
+% title("Accélération")
+% legend(["Mesurer" "Approximer"])
+
+%Calcul des erreurs
+N = length(acc_mes);
+y_ = (1/N) * sum(acc_mes);
+R_2 = (sum((acc_appro-y_).^2) ./ sum((acc_mes - y_) .^2));
+clear y_ N
+
+N = length(acc_appro);
+RMS_abs = sqrt((1/N) * sum((acc_appro - acc_mes(1:2:end)).^2));
+RMS_rel = sqrt((1/N) * sum(((acc_appro - acc_mes(1:2:end))./acc_mes(1:2:end)).^2));
+clear N
+
+%% Conception des asservissements
+%Valeurs
+B = (C_D0*S)/m;
+p_ini = p0 * exp(-h_ini/hs)
+p = p0 * exp(-h_mes/hs)
+
+%Calcul de la formule
+vit_appro = V_ini * exp(0.5*B*hs*((p-p_ini)/sin(Theta_ini_NASA)))
+
+%Graphique Vitesse approx vs mesurer
+% figure
+% hold on
+% scatter(t, vit_mes, "red")
+% plot(t(1:2:end), vit_appro, "blue")
+% grid on
 % title("Vitesse")
-% scatter(Vitesse.X,Vitesse.Y)
-% grid on
-% 
-% figure
-% title("Position")
-% scatter(Position.X,Position.Y)
-% grid on
+% legend(["Mesurer" "Approximer"])
 
-% À identifier
-% RO_0
-% h_s
+
+
