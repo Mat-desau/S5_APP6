@@ -41,6 +41,9 @@ q_ini_NASA = 0.0; %degrée
 %% Load les valeurs
 load("Accelero_Data_from_NASA.mat")
 
+S = 0.8;
+CD0 = 1.20;
+
 %% Accélération
 Accelertion = struct("X", t, "Y", acc_mes);
 
@@ -55,7 +58,7 @@ Diff1 = diff(acc_mes(1:end))/t(2);
 Erreur = ((h^2)/12) * (Diff1(end) - Diff1(1))
 
 %Mettre dans structure
-Vitesse = struct("Y", Vitesse_mes, "X", t);
+Vitesse = struct("Y", Vitesse_mes, "X", t, "Erreur", Erreur);
 
 %% Méthode Simpson
 Hauteur_mes(1) = H_ini_NASA;
@@ -67,23 +70,50 @@ for n = 3:2:length(Vitesse_mes)
 end
 
 Diff2 = diff(Diff1)/t(2);
-Erreur = ((h^2)/12) * (Diff1(end) - Diff1(1))
+Erreur = ((h^4)/180) * (Diff2(end) - Diff2(1))
 
 %Mettre dans structure
-Position = struct("Y", Hauteur_mes, "X", Position_mes);
+Position = struct("Y", Hauteur_mes, "X", Position_mes, "Erreur", Erreur);
 
-clear Vitesse_mes h acc_mes t Hauteur_mes Position_mes
+%% Identification p0 et hs
+
+C = [ones(length(Hauteur_mes),1), Hauteur_mes];
+Y = log((2*acc_mes(1:2:55))./(Vitesse_mes(1:2:55)).^2);
+A = pinv(C)*Y;
+
+p0 = exp(A(2))/(S*CD0);
+hs = -1/A(1);
+
+Acc_approximer = 0.5 * p0 * exp(-h/hs) * v(1:2:55).
+
+%lissage a 2 paramètres pour obtenir relation linaire entre p0 hs et a_mes
+
+%coeficient R2
+
+%erreur RMS approx
+
+%Erreur absolue
+
+%Erreur relatives
+
+
+
+
+
+
+
+
 
 %Affichage des approximations
-figure
-title("Vitesse")
-scatter(Vitesse.X,Vitesse.Y)
-grid on
-
-figure
-title("Position")
-scatter(Position.X,Position.Y)
-grid on
+% figure
+% title("Vitesse")
+% scatter(Vitesse.X,Vitesse.Y)
+% grid on
+% 
+% figure
+% title("Position")
+% scatter(Position.X,Position.Y)
+% grid on
 
 % À identifier
 % RO_0

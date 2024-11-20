@@ -41,6 +41,9 @@ q_ini_NASA = 0.0; %degrée
 %% Load les valeurs
 load("Accelero_Data_from_NASA.mat")
 
+S = 0.8;
+CD0 = 1.20;
+
 %% Accélération
 Accelertion = struct("X", t, "Y", acc_mes);
 
@@ -72,9 +75,33 @@ Erreur = ((h^4)/180) * (Diff2(end) - Diff2(1))
 %Mettre dans structure
 Position = struct("Y", Hauteur_mes, "X", Position_mes, "Erreur", Erreur);
 
-clear Vitesse_mes h acc_mes t Hauteur_mes Position_mes Erreur
-
 %% Identification p0 et hs
+
+C = [ones(length(Hauteur_mes),1), Hauteur_mes];
+Y = log((2*acc_mes(1:2:55))./(Vitesse_mes(1:2:55)).^2);
+A = pinv(C)*Y;
+
+p0 = exp(A(2))/(S*CD0);
+hs = -1/A(1);
+
+Acc_approximer = 0.5 * p0 * exp(-h/hs) * Vitesse_mes(1:2:55).^2 * S * CD0
+
+%lissage a 2 paramètres pour obtenir relation linaire entre p0 hs et a_mes
+
+%coeficient R2
+
+%erreur RMS approx
+
+%Erreur absolue
+
+%Erreur relatives
+
+
+
+
+
+
+
 
 
 %Affichage des approximations
