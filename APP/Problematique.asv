@@ -41,52 +41,71 @@ q_ini_NASA = 0.0; %degrée
 %% Load les valeurs
 load("Accelero_Data_from_NASA.mat")
 
-S = 0.8;
-CD0 = 1.20;
-
 %% Accélération
+%Mettre dans structure
 Accelertion = struct("X", t, "Y", acc_mes);
 
 %% Méthode de trapèze
-Vitesse_mes(1,1) = V_ini_NASA;
-h = t(2);
+%On commence a 6100
+vit_mes(1,1) = V_ini_NASA;
+Delta_x = t(2);
+
+%Faire la fonction
 for n = 2:length(acc_mes)
-    Vitesse_mes(n,1) = Vitesse_mes(1,1) - (acc_mes(1) + acc_mes(n) + 2*sum(acc_mes(2:n-1)))*(h/2);
+    vit_mes(n,1) = vit_mes(1,1) - (acc_mes(1) + acc_mes(n) + 2*sum(acc_mes(2:n-1)))*(Delta_x/2);
 end
 
-Diff1 = diff(acc_mes(1:end))/t(2);
-Erreur = ((h^2)/12) * (Diff1(end) - Diff1(1))
+%Differentiel pour erreur
+Diff1(1) = (acc_mes(2)-acc_mes(1))/Delta_x;
+Diff1(2) = (acc_mes(end)-acc_mes(end-1))/Delta_x;
+
+Erreur = ((Delta_x^2)/12) * (Diff1(2) - Diff1(1));
 
 %Mettre dans structure
-Vitesse = struct("Y", Vitesse_mes, "X", t, "Erreur", Erreur);
+Vitesse = struct("Y", vit_mes, "X", t, "Erreur", Erreur);
 
 %% Méthode Simpson
-Hauteur_mes(1) = H_ini_NASA;
-Position_mes(1) = t(1);
-h = t(2);
-for n = 3:2:length(Vitesse_mes)
-    Hauteur_mes(((n-1)/2)+1,1) = Hauteur_mes(1) - (Vitesse_mes(1) + Vitesse_mes(n) + 4*sum(Vitesse_mes(2:2:(n-1))) + 2*sum(Vitesse_mes(3:2:(n-1)))) * (h/3);
-    Position_mes(((n-1)/2)+1,1) = t(n);
+%On commence a une hauteur initiale
+h_mes(1) = H_ini_NASA;
+t_h_mes(1) = t(1);
+Delta_x = t(2);
+
+%Faire la fonction
+for n = 3:2:length(vit_mes)
+    h_mes(((n-1)/2)+1,1) = h_mes(1) - (vit_mes(1) + vit_mes(n) + 4*sum(vit_mes(2:2:(n-1))) + 2*sum(vit_mes(3:2:(n-1)))) * (Delta_x/3);
+    t_h_mes(((n-1)/2)+1,1) = t(n);
 end
 
-Diff2 = diff(Diff1)/t(2);
-Erreur = ((h^4)/180) * (Diff2(end) - Diff2(1))
+%Différentiel pour erreur
+Diff3(1) =  (vit_mes(4) - 3*vit_mes(3) + 3*vit_mes(2) - vit_mes(1))/ (Delta_x^3);
+Diff3(2) =  (vit_mes(end) - 3*vit_mes(end-1) + 3*vit_mes(end-2) - vit_mes(end-3))/ (Delta_x^3);
+
+Erreur = ((Delta_x^4)/180) * (Diff3(2) - Diff3(1));
 
 %Mettre dans structure
-Position = struct("Y", Hauteur_mes, "X", Position_mes, "Erreur", Erreur);
+Position = struct("Y", h_mes, "X", t_h_mes, "Erreur", Erreur);
 
 %% Identification p0 et hs
+%Moindre Carrer
+C = [ones(length(h_mes),1), h_mes];
+Y = log((2*acc_mes(1:2:55))./(vit_mes(1:2:55)).^2);
+A = pinv(C)*Y
 
-C = [ones(length(Hauteur_mes),1), Hauteur_mes];
-Y = log((2*acc_mes(1:2:55))./(Vitesse_mes(1:2:55)).^2);
-A = pinv(C)*Y;
+%Voir calculs à la main sur comment on a trouver
 
-p0 = exp(A(2))/(S*CD0);
-hs = -1/A(1);
+%Identification des paramètres manquant
+p0 = (m.*exp(A(1)))./(S.*C_D0)
+hs = -1./A(2)
 
-Acc_approximer = 0.5 * p0 * exp(-h/hs) * v(1:2:55).
+%Approximation de l'accélération
+acc_appro = (((0.5 * p0 * S * C_D0) .* exp(-h_mes/hs)) .* vit_mes(1:2:55).^2 )./m
 
-%lissage a 2 paramètres pour obtenir relation linaire entre p0 hs et a_mes
+%Graphique approximer avec le vrai
+figure
+hold on
+scatter(t, acc_mes, "red")
+scatter(t_h_mes, acc_appro, "blue")
+
 
 %coeficient R2
 
