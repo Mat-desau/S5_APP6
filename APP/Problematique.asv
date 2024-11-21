@@ -168,19 +168,19 @@ D_aero_cal(:,2) = P_dyn_cal(:,2)*S*C_D0;
 
 %% Calcul avec Newton-Raphson Limites Structurel
 %Pour trouver ça on a mit 
-h_dep(1) = 34250;
+h_dep(1) = 34000;
 h_dep(2) = 20000;
+indice_gamma = 2;
 
 for n = 1:2
-    h_dep(n) = n;
-    x = h_dep;
+    x = h_dep(n);
 
     %Calcul de la dériver
     P_vrai = p0*exp(-x/hs);
     P_prime = (-p0/hs)*exp(-x/hs);
     
-    V_vrai = V_ini*exp(0.5*B*hs*((P_vrai-p_ini)/sind(Gamma_ref(1))));
-    V_prime = (((0.5)*B*hs*V_ini)/sind(Gamma_ref(1))) * P_prime * exp(0.5*B*hs*((P_vrai-p_ini)/sind(Gamma_ref(1)))); %avec 250 km/h
+    V_vrai = V_ini*exp(0.5*B*hs*((P_vrai-p_ini)/sind(Gamma_ref(indice_gamma))));
+    V_prime = (((0.5)*B*hs*V_ini)/sind(Gamma_ref(indice_gamma))) * P_prime * exp(0.5*B*hs*((P_vrai-p_ini)/sind(Gamma_ref(indice_gamma)))); %avec 250 km/h
     
     % On enleve D_aero_max pour crée des nouveau zeros
     D_aero_vrai = ((0.5) * P_vrai * (V_vrai.^2) * S * C_D0) - D_aero_max;
@@ -198,82 +198,85 @@ for n = 1:2
         P_vrai = p0*exp(-x/hs);
         P_prime = (-p0/hs)*exp(-x/hs);
     
-        V_vrai = V_ini*exp(0.5*B*hs*((P_vrai-p_ini)/sind(Gamma_ref(1))));
-        V_prime = (((0.5)*B*hs*V_ini)/sind(Gamma_ref(1))) * P_prime * exp(0.5*B*hs*((P_vrai-p_ini)/sind(Gamma_ref(1)))); %avec 250 km/h
+        V_vrai = V_ini*exp(0.5*B*hs*((P_vrai-p_ini)/sind(Gamma_ref(indice_gamma))));
+        V_prime = (((0.5)*B*hs*V_ini)/sind(Gamma_ref(indice_gamma))) * P_prime * exp(0.5*B*hs*((P_vrai-p_ini)/sind(Gamma_ref(indice_gamma)))); %avec 250 km/h
     
         D_aero_vrai = ((0.5) * P_vrai * (V_vrai.^2) * S * C_D0) - D_aero_max;
         D_aero_prime = ((0.5) * S * C_D0 * ((P_prime * (V_vrai.^2))+(2*P_vrai*V_vrai*V_prime)));
     
         iter = iter + 1;
     end
-
+    
+    %Iter - Tol - D_aero - Vitesse - Position
     Val(n,1) = iter;
-    Val(n,2) = D_aero_vrai;
-    Val(n,3) = x;
+    Val(n,2) = abs(D_aero_vrai);
+    Val(n,3) = D_aero_vrai;
+    Val(n,4) = V_vrai;
+    Val(n,5) = x;
 end
 
+%Une fois qu'on a ces valeurs on peut trouver le reste
+h_min = Val(2,5);
+h_max = Val(1,5);
+
+v_min = Val(2,4);
+v_max = Val(1,4);
+
+vit_moy = (v_max + v_min) / 2;
+
+Delta_t = abs((abs(h_max-h_min)/(vit_moy*sind(Gamma_ref(indice_gamma)))));
 
 %% Texte
-% disp("---------------- INTEGRATION ----------------");
-% texte = ["Erreur Intégration Vitesse : ", Vitesse.Erreur];
-% disp(texte);
-% texte = ["Erreur Intégration Position : ", Position.Erreur];
-% disp(texte);
-% 
-% disp("---------------- ACCELERATION ----------------");
-% texte = ["Valeur de RMS_abs accélération : ", RMS_abs_acc];
-% disp(texte);
-% texte = ["Valeur de RMS_rel accélération : ", RMS_rel_acc];
-% disp(texte);
-% texte = ["Valeur de R^2 accélération : ", R_2_acc];
-% disp(texte);
-% 
-% disp("---------------- IDENTIFICATION ----------------");
-% texte = ["m : ", m_cal];
-% disp(texte);
-% texte = ["b : ", b_cal];
-% disp(texte);
-% texte = ["P_0 : ", p0];
-% disp(texte);
-% texte = ["h_s : ", hs];
-% disp(texte);
-% texte = ["Valeur de R^2 Identification : ", R_2_iden];
-% disp(texte);
-% 
-% disp("---------------- LIMITES STRUCTUREL ----------------");
-% disp("Gamma")
-% texte = ["Gamma avec 250m/s : ", Gamma_ref(1)];
-% disp(texte);
-% texte = ["Gamma avec 300m/s : ", Gamma_ref(2)];
-% disp(texte);
-% disp("P_dyn");
-% texte = ["P_dyn max avec 250m/s : ", max(P_dyn_cal(:,1))];
-% disp(texte);
-% texte = ["P_dyn max avec 300m/s : ", max(P_dyn_cal(:,2))];
-% disp(texte);
-% 
-% 
-% disp("h_min");
-% texte = ["h min avec 250m/s : ", min(h_array)];
-% disp(texte);
-% texte = ["h min avec 300m/s : ", min(h_array)];
-% disp(texte);
-% disp("v_min");
-% texte = ["v min avec 250m/s : ", min(vit_cal_RAA(:,1))];
-% disp(texte);
-% texte = ["v min avec 300m/s : ", min(vit_cal_RAA(:,2))];
-% disp(texte);
-% disp("h_max");
-% texte = ["h max avec 250m/s : ", max(h_array)];
-% disp(texte);
-% texte = ["h max avec 300m/s : ", max(h_array)];
-% disp(texte);
-% disp("v_max");
-% texte = ["v max avec 250m/s : ", max(vit_cal_RAA(:,1))];
-% disp(texte);
-% texte = ["v max avec 300m/s : ", max(vit_cal_RAA(:,2))];
-% disp(texte);
+disp("---------------- INTEGRATION ----------------");
+texte = ["Erreur Intégration Vitesse : ", Vitesse.Erreur];
+disp(texte);
+texte = ["Erreur Intégration Position : ", Position.Erreur];
+disp(texte);
 
+disp("---------------- ACCELERATION ----------------");
+texte = ["Valeur de RMS_abs accélération : ", RMS_abs_acc];
+disp(texte);
+texte = ["Valeur de RMS_rel accélération : ", RMS_rel_acc];
+disp(texte);
+texte = ["Valeur de R^2 accélération : ", R_2_acc];
+disp(texte);
+
+disp("---------------- IDENTIFICATION ----------------");
+texte = ["m : ", m_cal];
+disp(texte);
+texte = ["b : ", b_cal];
+disp(texte);
+texte = ["P_0 : ", p0];
+disp(texte);
+texte = ["h_s : ", hs];
+disp(texte);
+texte = ["Valeur de R^2 Identification : ", R_2_iden];
+disp(texte);
+
+disp("---------------- LIMITES STRUCTUREL ----------------");
+disp("Gamma")
+texte = ["Gamma avec 250m/s : ", Gamma_ref(1)];
+disp(texte);
+texte = ["Gamma avec 300m/s : ", Gamma_ref(2)];
+disp(texte);
+disp("P_dyn");
+texte = ["P_dyn max avec 250m/s : ", max(P_dyn_cal(:,1))];
+disp(texte);
+texte = ["P_dyn max avec 300m/s : ", max(P_dyn_cal(:,2))];
+disp(texte);
+
+disp("Newton-Raphson pour indice gamma = ");
+disp(indice_gamma);
+texte = ["h min avec indice_gamma : ", h_min];
+disp(texte);
+texte = ["h max avec indice_gamma : ", h_max];
+disp(texte);
+texte = ["v min avec indice_gamma : ", v_min];
+disp(texte);
+texte = ["v max avec indice_gamma : ", v_max];
+disp(texte);
+texte = ["v max avec indice_gamma : ", v_max];
+disp(texte);
 
 %% Graphiques
 % -------------------- Lissage -------------------------
