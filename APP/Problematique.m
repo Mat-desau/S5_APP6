@@ -53,7 +53,7 @@ Accelertion = struct("X", t, "Y", acc_mes);
 
 %% Méthode de trapèze
 %On commence a 6100
-vit_mes(1,1) = V_ini_NASA;
+vit_mes(1,1) = V_ini;
 Delta_x = t(2);
 
 %Faire la fonction
@@ -72,7 +72,7 @@ Vitesse = struct("Y", vit_mes, "X", t, "Erreur", Erreur);
 
 %% Méthode Simpson
 %On commence a une hauteur initiale
-h_mes(1) = H_ini_NASA;
+h_mes(1) = h_ini;
 t_h_mes(1) = t(1);
 Delta_x = t(2);
 
@@ -225,67 +225,67 @@ vit_moy = (v_max + v_min) / 2;
 Delta_t = abs((abs(h_max-h_min)/(vit_moy*sind(Gamma_ref(indice_gamma)))));
 
 %% Texte
-disp("---------------- INTEGRATION ----------------");
-texte = ["Erreur Intégration Vitesse : ", Vitesse.Erreur];
-disp(texte);
-texte = ["Erreur Intégration Position : ", Position.Erreur];
-disp(texte);
-
-disp("---------------- ACCELERATION ----------------");
-texte = ["Valeur de RMS_abs accélération : ", RMS_abs_acc];
-disp(texte);
-texte = ["Valeur de RMS_rel accélération : ", RMS_rel_acc];
-disp(texte);
-texte = ["Valeur de R^2 accélération : ", R_2_acc];
-disp(texte);
-
-disp("---------------- IDENTIFICATION ----------------");
-texte = ["m : ", m_cal];
-disp(texte);
-texte = ["b : ", b_cal];
-disp(texte);
-texte = ["P_0 : ", p0];
-disp(texte);
-texte = ["h_s : ", hs];
-disp(texte);
-texte = ["Valeur de R^2 Identification : ", R_2_iden];
-disp(texte);
-
-disp("---------------- LIMITES STRUCTUREL ----------------");
-disp("Gamma")
-texte = ["Gamma avec 250m/s : ", Gamma_ref(1)];
-disp(texte);
-texte = ["Gamma avec 300m/s : ", Gamma_ref(2)];
-disp(texte);
-disp("P_dyn");
-texte = ["P_dyn max avec 250m/s : ", max(P_dyn_cal(:,1))];
-disp(texte);
-texte = ["P_dyn max avec 300m/s : ", max(P_dyn_cal(:,2))];
-disp(texte);
-
-disp("Newton-Raphson pour indice gamma = ");
-disp(indice_gamma);
-
-texte = ["h min avec indice_gamma : ", h_min];
-disp(texte);
-texte = ["v min avec indice_gamma : ", v_min];
-disp(texte);
-texte = ["h_depart avec indice_gamma : ", h_dep(2)];
-disp(texte);
-texte = ["Iteration avec indice_gamma : ", Val(2,1)];
-disp(texte);
-
-texte = ["h max avec indice_gamma : ", h_max];
-disp(texte);
-texte = ["v max avec indice_gamma : ", v_max];
-disp(texte);
-texte = ["h_depart avec indice_gamma : ", h_dep(1)];
-disp(texte);
-texte = ["Iteration avec indice_gamma : ", Val(1,1)];
-disp(texte);
-
-texte = ["Delta_t avec indice_gamma : ", Delta_t];
-disp(texte);
+% disp("---------------- INTEGRATION ----------------");
+% texte = ["Erreur Intégration Vitesse : ", Vitesse.Erreur];
+% disp(texte);
+% texte = ["Erreur Intégration Position : ", Position.Erreur];
+% disp(texte);
+% 
+% disp("---------------- ACCELERATION ----------------");
+% texte = ["Valeur de RMS_abs accélération : ", RMS_abs_acc];
+% disp(texte);
+% texte = ["Valeur de RMS_rel accélération : ", RMS_rel_acc];
+% disp(texte);
+% texte = ["Valeur de R^2 accélération : ", R_2_acc];
+% disp(texte);
+% 
+% disp("---------------- IDENTIFICATION ----------------");
+% texte = ["m : ", m_cal];
+% disp(texte);
+% texte = ["b : ", b_cal];
+% disp(texte);
+% texte = ["P_0 : ", p0];
+% disp(texte);
+% texte = ["h_s : ", hs];
+% disp(texte);
+% texte = ["Valeur de R^2 Identification : ", R_2_iden];
+% disp(texte);
+% 
+% disp("---------------- LIMITES STRUCTUREL ----------------");
+% disp("Gamma")
+% texte = ["Gamma avec 250m/s : ", Gamma_ref(1)];
+% disp(texte);
+% texte = ["Gamma avec 300m/s : ", Gamma_ref(2)];
+% disp(texte);
+% disp("P_dyn");
+% texte = ["P_dyn max avec 250m/s : ", max(P_dyn_cal(:,1))];
+% disp(texte);
+% texte = ["P_dyn max avec 300m/s : ", max(P_dyn_cal(:,2))];
+% disp(texte);
+% 
+% disp("Newton-Raphson pour indice gamma = ");
+% disp(indice_gamma);
+% 
+% texte = ["h min avec indice_gamma : ", h_min];
+% disp(texte);
+% texte = ["v min avec indice_gamma : ", v_min];
+% disp(texte);
+% texte = ["h_depart avec indice_gamma : ", h_dep(2)];
+% disp(texte);
+% texte = ["Iteration avec indice_gamma : ", Val(2,1)];
+% disp(texte);
+% 
+% texte = ["h max avec indice_gamma : ", h_max];
+% disp(texte);
+% texte = ["v max avec indice_gamma : ", v_max];
+% disp(texte);
+% texte = ["h_depart avec indice_gamma : ", h_dep(1)];
+% disp(texte);
+% texte = ["Iteration avec indice_gamma : ", Val(1,1)];
+% disp(texte);
+% 
+% texte = ["Delta_t avec indice_gamma : ", Delta_t];
+% disp(texte);
 
 
 
