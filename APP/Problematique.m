@@ -29,6 +29,7 @@ q_ini = 0.0; %degré/s
 %% Conditions finales désirer
 V_fin1 = 250; %m/s
 V_fin2 = 300; %m/s
+V_fin = [250 300]; %m/s
 h_fin = 10000; %m
 
 %% Conditions initiales NASA
@@ -198,7 +199,8 @@ for n = 1:2
     
         V_vrai = V_ini*exp(0.5*B*hs*((P_vrai-p_ini)/sind(Gamma_ref(indice_gamma))));
         V_prime = (((0.5)*B*hs*V_ini)/sind(Gamma_ref(indice_gamma))) * P_prime * exp(0.5*B*hs*((P_vrai-p_ini)/sind(Gamma_ref(indice_gamma)))); %avec 250 km/h
-    
+        
+        % On enleve D_aero_max pour faire que les "zeros" sont a D_aero_max
         D_aero_vrai = ((0.5) * P_vrai * (V_vrai.^2) * S * C_D0) - D_aero_max;
         D_aero_prime = ((0.5) * S * C_D0 * ((P_prime * (V_vrai.^2))+(2*P_vrai*V_vrai*V_prime)));
     
@@ -213,7 +215,7 @@ for n = 1:2
     Val(n,5) = x;
 end
 
-%Une fois qu'on a ces valeurs on peut trouver le reste
+%Avec ces points on peut trouver les autres données
 h_min = Val(2,5);
 h_max = Val(1,5);
 
@@ -223,6 +225,39 @@ v_max = Val(1,4);
 vit_moy = (v_max + v_min) / 2;
 
 Delta_t = abs((abs(h_max-h_min)/(vit_moy*sind(Gamma_ref(indice_gamma)))));
+
+
+%% Commande dynamique de translation
+%Pour Kp
+Tau = 0.25;
+K_p = 1/Tau;
+
+%Pour les valeurs
+Gamma = 1;
+v = 1;
+
+%Rayon
+r = R_mars + h_array;
+g = (U_mars/(v*(r.^2)))';
+
+%Pour les theta commande
+temp1 = ((P_dyn_cal(:,indice_gamma)*S*C_Lalpha*Gamma)/(v*m));
+temp2 = (((v./r)-g)*cosd(Gamma));
+temp3 = (K_p*(Gamma_ref(indice_gamma)-Gamma));
+temp4 = (P_dyn_cal(:,indice_gamma)*S*C_Lalpha)/(v*m);
+
+%Calcul de theta commande
+Theta_cmd = (temp1-temp2+temp3)./(temp4);
+
+
+% %Pour le L_aero
+% Alpha = Theta - Gamma_ref(indice_gamma);
+% L_aero = P_dyn_cal(:,indice_gamma) * S * C_Lalpha * Alpha;
+% 
+% %Pour la formule de Gamma_point
+% Gamma_point = (1/V_fin(indice_gamma)) * ((L_aero/m) + (((((V_fin(indice_gamma))^2)./r)-g)*cos(Gamma)));
+
+
 
 %% Texte
 % disp("---------------- INTEGRATION ----------------");
@@ -263,7 +298,7 @@ Delta_t = abs((abs(h_max-h_min)/(vit_moy*sind(Gamma_ref(indice_gamma)))));
 % texte = ["P_dyn max avec 300m/s : ", max(P_dyn_cal(:,2))];
 % disp(texte);
 % 
-% disp("Newton-Raphson pour indice gamma = ");
+% disp("Newton-Raphson pour indice gamma = (1 = 250m/s)(2 = 300m/s)");
 % disp(indice_gamma);
 % 
 % texte = ["h min avec indice_gamma : ", h_min];
