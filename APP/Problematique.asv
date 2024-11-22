@@ -25,6 +25,7 @@ h_ini = 120000; %m
 s_ini = 0.0; %degré
 Theta_ini = -80; %deg
 q_ini = 0.0; %degré/s
+z0 = [V_ini, Gamma_ini, h_ini, s_ini, Theta_ini, q_ini];
 
 %% Conditions finales désirer
 V_fin1 = 250; %m/s
@@ -399,6 +400,31 @@ Theta_cmd = (temp1-temp2+temp3)./(temp4);
 % title("D_a_e_r_o calculé par RAA")
 % legend(["250m/s" "300m/s" "D_a_e_r_o max"])
 
+
+function f = translation(t,z)
+    %z = [v_ini, Gamma_ini, h_ini, s_ini, Theta_ini, q_ini]
+    
+    func_v = z(1);
+    func_Gamma = z(2);
+    func_h = z(3);
+    func_s = z(4);
+    func_Theta = z(5);
+    func_q = z(6);
+    func_Gamma_ref = Gamma_ref(indice_gamma);
+
+    %Rayon
+    func_r = R_mars + func_h;
+
+    %Pdyn
+    func_p = p0 * exp(-func_h/hs);
+    func_P_dyn = (0.5) * func_p * func
+    %p_dyn
+    %r
+    %gamma
+    %v
+    %
+
+end
 
 
 disp("Hello World")
