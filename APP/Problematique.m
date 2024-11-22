@@ -85,7 +85,7 @@ end
 
 %Différentiel pour erreur
 Diff3(1) =  (vit_mes(4) - 3*vit_mes(3) + 3*vit_mes(2) - vit_mes(1))/ (Delta_x^3);
-Diff3(2) =  (vit_mes(end) - 3*vit_mes(end-1) + 3*vit_mes(end-2) - vit_mes(end-3))/ (Delta_x^3);
+Diff3(2) =  (vit_mes(end) - 3*vit_mes(end-1) + 3*vit_mes(end-2) - vit_mes(end-3))/ (Delta_x^3)
 
 Erreur = ((Delta_x^4)/180) * (Diff3(2) - Diff3(1));
 

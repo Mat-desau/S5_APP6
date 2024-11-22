@@ -85,7 +85,7 @@ end
 
 %Différentiel pour erreur
 Diff3(1) =  (vit_mes(4) - 3*vit_mes(3) + 3*vit_mes(2) - vit_mes(1))/ (Delta_x^3);
-Diff3(2) =  (vit_mes(end) - 3*vit_mes(end-1) + 3*vit_mes(end-2) - vit_mes(end-3))/ (Delta_x^3);
+Diff3(2) =  (vit_mes(end) - 3*vit_mes(end-1) + 3*vit_mes(end-2) - vit_mes(end-3))/ (Delta_x^3)
 
 Erreur = ((Delta_x^4)/180) * (Diff3(2) - Diff3(1));
 
@@ -228,32 +228,34 @@ Delta_t = abs((abs(h_max-h_min)/(vit_moy*sind(Gamma_ref(indice_gamma)))));
 
 
 %% Commande dynamique de translation
+%Pour Kp
 Tau = 0.25;
 K_p = 1/Tau;
+
+%Pour les valeurs
 Gamma = 1;
 v = 1;
 
+%Rayon
 r = R_mars + h_array;
 g = (U_mars/(v*(r.^2)))';
 
-Theta_cmd = (((P_dyn_cal(:,indice_gamma)*S*C_Lalpha*Gamma)/(v*m))-(((v/r)-g)*cosd(Gamma))+(K_p(Gamma_ref(indice_gamma)-Gamma)))/((P_dyn_cal(:,1)*S*C_Lalpha))
+%Pour les theta commande
+temp1 = ((P_dyn_cal(:,indice_gamma)*S*C_Lalpha*Gamma)/(v*m));
+temp2 = (((v./r)-g)*cosd(Gamma));
+temp3 = (K_p*(Gamma_ref(indice_gamma)-Gamma));
+temp4 = (P_dyn_cal(:,indice_gamma)*S*C_Lalpha)/(v*m);
+
+%Calcul de theta commande
+Theta_cmd = (temp1-temp2+temp3)./(temp4);
 
 
-
-
-Gamma = 1;
-Theta = 1;
-
-%Pour trouver le g(r)
-
-
-
-%Pour le L_aero
-Alpha = Theta - Gamma_ref(indice_gamma);
-L_aero = P_dyn_cal(:,indice_gamma) * S * C_Lalpha * Alpha;
-
-%Pour la formule de Gamma_point
-Gamma_point = (1/V_fin(indice_gamma)) * ((L_aero/m) + (((((V_fin(indice_gamma))^2)./r)-g)*cos(Gamma)));
+% %Pour le L_aero
+% Alpha = Theta - Gamma_ref(indice_gamma);
+% L_aero = P_dyn_cal(:,indice_gamma) * S * C_Lalpha * Alpha;
+% 
+% %Pour la formule de Gamma_point
+% Gamma_point = (1/V_fin(indice_gamma)) * ((L_aero/m) + (((((V_fin(indice_gamma))^2)./r)-g)*cos(Gamma)));
 
 
 
