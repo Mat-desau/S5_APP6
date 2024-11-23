@@ -3,7 +3,6 @@ clear all
 close all
 warning off
 
-
 %% Assignation des variables
 m = 50; %kg
 J = 1.5; %kg-m^2
@@ -15,7 +14,7 @@ C_D0 = 1.2;
 C_Lalpha = 0.80;
 C_Malpha = -0.07;
 C_Mq = -0.05;
-C_Mgamma = 0.10;
+C_Mdelta = 0.10;
 B = (C_D0*S)/m;
 
 %% Conditions initiales
@@ -86,7 +85,7 @@ end
 
 %Différentiel pour erreur
 Diff3(1) =  (vit_mes(4) - 3*vit_mes(3) + 3*vit_mes(2) - vit_mes(1))/ (Delta_x^3);
-Diff3(2) =  (vit_mes(end) - 3*vit_mes(end-1) + 3*vit_mes(end-2) - vit_mes(end-3))/ (Delta_x^3)
+Diff3(2) =  (vit_mes(end) - 3*vit_mes(end-1) + 3*vit_mes(end-2) - vit_mes(end-3))/ (Delta_x^3);
 
 Erreur = ((Delta_x^4)/180) * (Diff3(2) - Diff3(1));
 
@@ -228,36 +227,24 @@ vit_moy = (v_max + v_min) / 2;
 Delta_t = abs((abs(h_max-h_min)/(vit_moy*sind(Gamma_ref(indice_gamma)))));
 
 
-%% Commande dynamique de translation
+%% Commande dynamique
 %Pour Kp
-Tau = 0.25;
-K_p = 1/Tau;
+Tau_trans = 0.25;
+K_p_trans = 1/Tau_trans;
 
-%Pour les valeurs
-Gamma = 1;
-v = 1;
+Zeta_rot = 0.7;
+Omega_rot = 20; %rad/s
 
-%Rayon
-r = R_mars + h_array;
-g = (U_mars/(v*(r.^2)))';
+K_p_rot = Omega_rot^2;
+K_d_rot = Zeta_rot*Omega_rot;
 
-%Pour les theta commande
-temp1 = ((P_dyn_cal(:,indice_gamma)*S*C_Lalpha*Gamma)/(v*m));
-temp2 = (((v./r)-g)*cosd(Gamma));
-temp3 = (K_p*(Gamma_ref(indice_gamma)-Gamma));
-temp4 = (P_dyn_cal(:,indice_gamma)*S*C_Lalpha)/(v*m);
+%Sortir les variables nécessaires pour le code
+save variables.mat p0 R_mars U_mars hs V_fin p_fin indice_gamma B S C_Lalpha m K_p_trans C_Malpha d J C_Mq K_p_rot K_d_rot C_Mdelta C_D0
 
-%Calcul de theta commande
-Theta_cmd = (temp1-temp2+temp3)./(temp4);
-
-
-% %Pour le L_aero
-% Alpha = Theta - Gamma_ref(indice_gamma);
-% L_aero = P_dyn_cal(:,indice_gamma) * S * C_Lalpha * Alpha;
-% 
-% %Pour la formule de Gamma_point
-% Gamma_point = (1/V_fin(indice_gamma)) * ((L_aero/m) + (((((V_fin(indice_gamma))^2)./r)-g)*cos(Gamma)));
-
+tspan = [t(1) t(end)];
+reltol2 = 1e-10;
+options = odeset('abstol', 1e-06, 'reltol', reltol2);
+[t_dyn, z_dyn] = ode45('commande', tspan, z0, options);
 
 
 %% Texte
@@ -401,30 +388,6 @@ Theta_cmd = (temp1-temp2+temp3)./(temp4);
 % legend(["250m/s" "300m/s" "D_a_e_r_o max"])
 
 
-function f = translation(t,z)
-    %z = [v_ini, Gamma_ini, h_ini, s_ini, Theta_ini, q_ini]
-    
-    func_v = z(1);
-    func_Gamma = z(2);
-    func_h = z(3);
-    func_s = z(4);
-    func_Theta = z(5);
-    func_q = z(6);
-    func_Gamma_ref = Gamma_ref(indice_gamma);
-
-    %Rayon
-    func_r = R_mars + func_h;
-
-    %Pdyn
-    func_p = p0 * exp(-func_h/hs);
-    func_P_dyn = (0.5) * func_p * func_v^2;
-    %p_dyn
-    %r
-    %gamma
-    %v
-    %
-
-end
 
 
 disp("Hello World")
