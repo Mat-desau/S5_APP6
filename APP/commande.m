@@ -41,9 +41,16 @@
     
     %Calcul de theta commande
     func_Theta_cmd = (temp1_1-temp2_1+temp3_1)./(temp4_1);
-    
+
+    %Ajustement de theta commande
+    if func_Theta_cmd < -60
+        func_Theta_cmd = -60;
+    elseif func_Theta_cmd > 60
+        func_Theta_cmd = 60;
+    end
+
     %Gamma point
-    if Asservissement
+    if Asservissement == 1
         func_Gamma_point = (-temp1_1+temp2_1) + temp4_1*func_Theta_cmd;
     else
         func_Gamma_point = (1/func_v) * ((func_L_aero/m)*(((func_v^2)/func_r)-func_g)*cosd(func_Gamma));
@@ -60,7 +67,7 @@
     func_Delta_cmd = (temp1_2 + temp2_2 + temp3_2)/temp4_2;
 
     %Gamma point
-    if Asservissement
+    if Asservissement == 1
         func_q_point = (-temp1_2) + temp4_2*func_Delta_cmd;
     else
         func_q_point = (1/J)*(func_P_dyn*S*d * ((C_Malpha*func_Alpha) + ((d*C_Mq*func_q)/(2*func_v))));

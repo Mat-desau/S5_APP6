@@ -41,7 +41,13 @@
     
     %Calcul de theta commande
     func_Theta_cmd = (temp1_1-temp2_1+temp3_1)./(temp4_1);
-    
+
+    %Ajustement de theta commande
+    if func_Theta_cmd < -60
+        func_Theta_cmd = -60;
+    elseif
+        
+
     %Gamma point
     if Asservissement == 1
         func_Gamma_point = (-temp1_1+temp2_1) + temp4_1*func_Theta_cmd;
