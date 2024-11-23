@@ -24,6 +24,7 @@ h_ini = 120000; %m
 s_ini = 0.0; %degré
 Theta_ini = -80; %deg
 q_ini = 0.0; %degré/s
+Asservissement = 1; %1 = on 0 = off
 z0 = [V_ini, Gamma_ini, h_ini, s_ini, Theta_ini, q_ini];
 
 %% Conditions finales désirer
@@ -239,9 +240,10 @@ K_p_rot = Omega_rot^2;
 K_d_rot = Zeta_rot*Omega_rot;
 
 %Sortir les variables nécessaires pour le code
-save variables.mat p0 R_mars U_mars hs V_fin p_fin indice_gamma B S C_Lalpha m K_p_trans C_Malpha d J C_Mq K_p_rot K_d_rot C_Mdelta C_D0
+save variables.mat p0 R_mars U_mars hs V_fin p_fin indice_gamma B S C_Lalpha m K_p_trans C_Malpha d J C_Mq K_p_rot K_d_rot C_Mdelta C_D0 Asservissement
 
-tspan = [t(1) t(end)];
+
+tspan = [0 100];
 reltol2 = 1e-10;
 options = odeset('abstol', 1e-06, 'reltol', reltol2);
 [t_dyn, z_dyn] = ode45('commande', tspan, z0, options);
@@ -387,7 +389,29 @@ options = odeset('abstol', 1e-06, 'reltol', reltol2);
 % title("D_a_e_r_o calculé par RAA")
 % legend(["250m/s" "300m/s" "D_a_e_r_o max"])
 
+figure
+plot(t_dyn, z_dyn(:,1))
+title("Vitesse")
 
+figure
+plot(t_dyn, z_dyn(:,2))
+title("Gamma")
+
+figure
+plot(t_dyn, z_dyn(:,3))
+title("Hauteur")
+
+figure
+plot(t_dyn, z_dyn(:,4))
+title("s")
+
+figure
+plot(t_dyn, z_dyn(:,5))
+title("Theta")
+
+figure
+plot(t_dyn, z_dyn(:,6))
+title("q")
 
 
 disp("Hello World")
