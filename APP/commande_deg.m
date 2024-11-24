@@ -6,11 +6,11 @@
     load("variables.mat")
 
     func_v = z(1);
-    func_Gamma = deg2rad(z(2));
+    func_Gamma = z(2);
     func_h = z(3);
     func_s = z(4);
-    func_Theta = deg2rad(z(5));
-    func_q = deg2rad(z(6));
+    func_Theta = z(5);
+    func_q = z(6);
 
     %Rayon
     func_r = R_mars + func_h; %Rayon
@@ -22,7 +22,7 @@
 
     %Gamma_ref
     func_Delta_V_Aero = V_fin(indice_gamma) - func_v;
-    func_Gamma_ref = asin((0.5)*B*hs*((p_fin - func_p)/(log(1 + (func_Delta_V_Aero/func_v)))));
+    func_Gamma_ref = asind((0.5)*B*hs*((p_fin - func_p)/(log(1 + (func_Delta_V_Aero/func_v)))));
 
     %Alpha
     func_Alpha = func_Theta - func_Gamma;
@@ -35,7 +35,7 @@
     
     %Pour les theta commande
     temp1_1 = ((func_P_dyn*S*C_Lalpha*func_Gamma) / (func_v*m));
-    temp2_1 = (((func_v./func_r)-func_g) * cos(func_Gamma));
+    temp2_1 = (((func_v./func_r)-func_g) * cosd(func_Gamma));
     temp3_1 = (K_p_trans*(func_Gamma_ref-func_Gamma));
     temp4_1 = (func_P_dyn*S*C_Lalpha) / (func_v*m);
     
@@ -43,17 +43,17 @@
     func_Theta_cmd = (temp1_1-temp2_1+temp3_1)./(temp4_1);
 
     %Ajustement de theta commande
-    if func_Theta_cmd <= deg2rad(-60)
-        func_Theta_cmd = deg2rad(-60);
-    elseif func_Theta_cmd >= deg2rad(60)
-        func_Theta_cmd = deg2rad(60);
+    if func_Theta_cmd <= -60
+        func_Theta_cmd = -60;
+    elseif func_Theta_cmd >= 60
+        func_Theta_cmd = 60;
     end
 
     %Gamma point
     if Asservissement == 1
         func_Gamma_point = (-temp1_1+temp2_1) + temp4_1*func_Theta_cmd;
     else
-        func_Gamma_point = (1/func_v) * ((func_L_aero/m)*(((func_v^2)/func_r)-func_g)*cos(func_Gamma));
+        func_Gamma_point = (1/func_v) * ((func_L_aero/m)*(((func_v^2)/func_r)-func_g)*cosd(func_Gamma));
     end
 
     %Pour les delta commande
@@ -74,10 +74,10 @@
     end
 
     %Ressortir toute les valeurs qui sont nécessaire
-    f(1) = ((-1)*(func_D_aero/m)) - (func_g*sin(func_Gamma));
+    f(1) = ((-1)*(func_D_aero/m)) - (func_g*sind(func_Gamma));
     f(2) = func_Gamma_point;
-    f(3) = func_v * sin(func_Gamma);
-    f(4) = (func_v/func_r) * cos(func_Gamma);
+    f(3) = func_v * sind(func_Gamma);
+    f(4) = (func_v/func_r) * cosd(func_Gamma);
     f(5) = func_q;
     f(6) = func_q_point;
 

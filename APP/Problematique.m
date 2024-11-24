@@ -1,6 +1,6 @@
 clc
 clear all
-close all
+%close all
 warning off
 
 %% Assignation des variables
@@ -24,7 +24,7 @@ h_ini = 120000; %m
 s_ini = 0.0; %degré
 Theta_ini = -80; %deg
 q_ini = 0.0; %degré/s
-Asservissement = 1; %1 = on 0 = off
+Asservissement = 0; %1 = on 0 = off
 z0 = [V_ini, Gamma_ini, h_ini, s_ini, Theta_ini, q_ini];
 
 %% Conditions finales désirer

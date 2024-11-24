@@ -22,10 +22,10 @@
 
     %Gamma_ref
     func_Delta_V_Aero = V_fin(indice_gamma) - func_v;
-    func_Gamma_ref = asind((0.5)*B*hs*((p_fin - func_p)./(log(1 + (func_Delta_V_Aero./func_v)))));
+    func_Gamma_ref = asind((0.5)*B*hs*((p_fin - func_p)/(log(1 + (func_Delta_V_Aero/func_v)))));
 
     %Alpha
-    func_Alpha = func_Theta - func_Gamma;
+    func_Alpha = deg2rad(func_Theta - func_Gamma;
 
     %Calcul de L_aero
     func_L_aero = func_P_dyn*S*C_Lalpha*func_Alpha;
@@ -43,10 +43,11 @@
     func_Theta_cmd = (temp1_1-temp2_1+temp3_1)./(temp4_1);
 
     %Ajustement de theta commande
-    if func_Theta_cmd < -60
+    if func_Theta_cmd <= -60
         func_Theta_cmd = -60;
-    elseif
-        
+    elseif func_Theta_cmd >= 60
+        func_Theta_cmd = 60;
+    end
 
     %Gamma point
     if Asservissement == 1
