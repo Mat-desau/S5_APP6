@@ -343,15 +343,15 @@ disp(texte);
 
 % -------------------- RAA -------------------------
 %Graphique Vitesse calculer par RAA
-% figure
-% hold on
-% scatter(t, vit_mes, "blue", 'filled')
-% plot(t_28, vit_appro, "red")
-% grid on
-% xlabel("Temps(s)")
-% ylabel("Vitesse (m/s)")
-% title("Vitesse calculé par RAA")
-% legend(["Mesurer" "Approximer"])
+figure
+hold on
+scatter(t, vit_mes, "blue", 'filled')
+plot(t_28, vit_appro, "red")
+grid on
+xlabel("Temps(s)")
+ylabel("Vitesse (m/s)")
+title("Vitesse calculé par RAA")
+legend(["Mesurer" "Approximer"])
 
 %Graphique Accélération calculé par RAA
 % figure
