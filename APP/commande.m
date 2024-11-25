@@ -6,24 +6,27 @@
     load("variables.mat")
 
     func_v = z(1);
-    func_Gamma = deg2rad(z(2));
+    func_Gamma = z(2);
     func_h = z(3);
     func_s = z(4);
-    func_Theta = deg2rad(z(5));
-    func_q = deg2rad(z(6));
+    func_Theta = z(5);
+    func_q = z(6);
 
     %Rayon
     func_r = R_mars + func_h; %Rayon
-    func_g = (U_mars/(func_v*(func_r.^2)))';
+    func_r_fin = R_mars + h_fin;
+    func_g = (U_mars/((func_r^2)));
+    func_g2 = (U_mars/(func_v*(func_r^2)));
 
     %Pdyn
     func_p = p0 * exp(-func_h/hs);
     func_P_dyn = (0.5) * func_p * func_v^2;
 
     %Gamma_ref
-    func_Delta_V_Aero = V_fin(indice_gamma) - func_v;
+    func_Delta_V_Aero = V_fin(indice_gamma) - sqrt((func_v^2)+(2*U_mars*((1/func_r_fin)-(1/func_r))));
+    %func_Delta_V_Aero = V_fin(indice_gamma) - func_v;
     func_Gamma_ref = asin((0.5)*B*hs*((p_fin - func_p)/(log(1 + (func_Delta_V_Aero/func_v)))));
-
+    
     %Alpha
     func_Alpha = func_Theta - func_Gamma;
 
@@ -35,12 +38,18 @@
     
     %Pour les theta commande
     temp1_1 = ((func_P_dyn*S*C_Lalpha*func_Gamma) / (func_v*m));
-    temp2_1 = (((func_v./func_r)-func_g) * cos(func_Gamma));
+    temp2_1 = (((func_v/func_r)-func_g2) * cos(func_Gamma));
     temp3_1 = (K_p_trans*(func_Gamma_ref-func_Gamma));
     temp4_1 = (func_P_dyn*S*C_Lalpha) / (func_v*m);
     
     %Calcul de theta commande
-    func_Theta_cmd = (temp1_1-temp2_1+temp3_1)./(temp4_1);
+    func_Theta_cmd = (temp1_1-temp2_1+temp3_1)/(temp4_1);
+
+    if Asservissement == 1
+        func_Gamma_point = (1/func_v) * ((func_L_aero/m)+(((func_v^2)/func_r)-func_g)*cos(func_Gamma));
+    else
+        func_Gamma_point = (1/func_v) * ((func_L_aero/m)+(((func_v^2)/func_r)-func_g)*cos(func_Gamma));
+    end
 
     %Ajustement de theta commande
     if func_Theta_cmd <= deg2rad(-60)
@@ -49,18 +58,10 @@
         func_Theta_cmd = deg2rad(60);
     end
 
-    %Gamma point
-    if Asservissement == 1
-        func_Gamma_point = (-temp1_1+temp2_1) + temp4_1*func_Theta_cmd;
-    else
-        func_Gamma_point = (1/func_v) * ((func_L_aero/m)*(((func_v^2)/func_r)-func_g)*cos(func_Gamma));
-    end
-
     %Pour les delta commande
     temp1_2 = (-1)*(((func_P_dyn*S*d*C_Malpha*func_Alpha)/J)+(func_P_dyn*S*d*C_Mq*func_q*(d/(2*J*func_v))));    
     temp2_2 = (K_p_rot) * (func_Theta_cmd - func_Theta);
-            %pas sur de ça theta commande point c'est quoi 
-    temp3_2 = (K_d_rot) * (func_Theta_cmd - func_q);
+    temp3_2 = (K_d_rot) * (0 - func_q);
     temp4_2 = ((func_P_dyn*S*d*C_Mdelta)/J);
     
     %Calcul de delta commande
@@ -82,11 +83,5 @@
     f(6) = func_q_point;
 
     f = f(:);
-
-    %Gamma
-    %Gamma_ref
-    %v
-    %
-
 end
 

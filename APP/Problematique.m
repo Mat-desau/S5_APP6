@@ -24,9 +24,9 @@ h_ini = 120000; %m
 s_ini = 0.0; %degré
 Theta_ini = -80; %deg
 q_ini = 0.0; %degré/s
-indice_gamma = 2;   %1 = 250m/s     2 = 300m/s
-Asservissement = 0; %1 = on         0 = off
-z0 = [V_ini, Gamma_ini, h_ini, s_ini, Theta_ini, q_ini];
+indice_gamma = 1;   %1 = 250m/s     2 = 300m/s
+Asservissement = 1; %1 = on         0 = off
+z0 = [V_ini, deg2rad(Gamma_ini), h_ini, deg2rad(s_ini), deg2rad(Theta_ini), deg2rad(q_ini)];
 
 %% Conditions finales désirer
 V_fin1 = 250; %m/s
@@ -237,80 +237,84 @@ Zeta_rot = 0.7;
 Omega_rot = 20; %rad/s
 
 K_p_rot = Omega_rot^2;
-K_d_rot = Zeta_rot*Omega_rot;
+K_d_rot = 2*Zeta_rot*Omega_rot;
 
 %Sortir les variables nécessaires pour le code
-save variables.mat p0 R_mars U_mars hs V_fin p_fin indice_gamma B S C_Lalpha m K_p_trans C_Malpha d J C_Mq K_p_rot K_d_rot C_Mdelta C_D0 Asservissement
+save variables.mat p0 R_mars U_mars hs V_fin p_fin indice_gamma B S C_Lalpha m K_p_trans C_Malpha d J C_Mq K_p_rot K_d_rot C_Mdelta C_D0 Asservissement h_fin
 
-
-tspan = [0 100];
+tspan = [0 200];
 reltol2 = 1e-10;
 options = odeset('abstol', 1e-06, 'reltol', reltol2);
 [t_dyn, z_dyn] = ode45('commande', tspan, z0, options);
 
+k = find(z_dyn(:,3) <= 10000);
+
+tspan = [0 t_dyn(k(1))];
+[t_dyn, z_dyn] = ode45('commande', tspan, z0, options);
+
 
 %% Texte
-disp("---------------- INTEGRATION ----------------");
-texte = ["Erreur Intégration Vitesse : ", Vitesse.Erreur];
-disp(texte);
-texte = ["Erreur Intégration Position : ", Position.Erreur];
-disp(texte);
-
-disp("---------------- ACCELERATION ----------------");
-texte = ["Valeur de RMS_abs accélération : ", RMS_abs_acc];
-disp(texte);
-texte = ["Valeur de RMS_rel accélération : ", RMS_rel_acc];
-disp(texte);
-texte = ["Valeur de R^2 accélération : ", R_2_acc];
-disp(texte);
-
-disp("---------------- IDENTIFICATION ----------------");
-texte = ["m : ", m_cal];
-disp(texte);
-texte = ["b : ", b_cal];
-disp(texte);
-texte = ["P_0 : ", p0];
-disp(texte);
-texte = ["h_s : ", hs];
-disp(texte);
-texte = ["Valeur de R^2 Identification : ", R_2_iden];
-disp(texte);
-
-disp("---------------- LIMITES STRUCTUREL ----------------");
-disp("Gamma")
-texte = ["Gamma avec 250m/s : ", Gamma_ref(1)];
-disp(texte);
-texte = ["Gamma avec 300m/s : ", Gamma_ref(2)];
-disp(texte);
-disp("P_dyn");
-texte = ["P_dyn max avec 250m/s : ", max(P_dyn_cal(:,1))];
-disp(texte);
-texte = ["P_dyn max avec 300m/s : ", max(P_dyn_cal(:,2))];
-disp(texte);
-
-disp("Newton-Raphson pour indice gamma = (1 = 250m/s)(2 = 300m/s)");
-disp(indice_gamma);
-
-texte = ["h min avec indice_gamma : ", h_min];
-disp(texte);
-texte = ["v min avec indice_gamma : ", v_min];
-disp(texte);
-texte = ["h_depart avec indice_gamma : ", h_dep(2)];
-disp(texte);
-texte = ["Iteration avec indice_gamma : ", Val(2,1)];
-disp(texte);
-
-texte = ["h max avec indice_gamma : ", h_max];
-disp(texte);
-texte = ["v max avec indice_gamma : ", v_max];
-disp(texte);
-texte = ["h_depart avec indice_gamma : ", h_dep(1)];
-disp(texte);
-texte = ["Iteration avec indice_gamma : ", Val(1,1)];
-disp(texte);
-
-texte = ["Delta_t avec indice_gamma : ", Delta_t];
-disp(texte);
+% disp("---------------- INTEGRATION ----------------");
+% texte = ["Erreur Intégration Vitesse : ", Vitesse.Erreur];
+% disp(texte);
+% texte = ["Erreur Intégration Position : ", Position.Erreur];
+% disp(texte);
+% 
+% disp("---------------- ACCELERATION ----------------");
+% texte = ["Valeur de RMS_abs accélération : ", RMS_abs_acc];
+% disp(texte);
+% texte = ["Valeur de RMS_rel accélération : ", RMS_rel_acc];
+% disp(texte);
+% texte = ["Valeur de R^2 accélération : ", R_2_acc];
+% disp(texte);
+% 
+% disp("---------------- IDENTIFICATION ----------------");
+% texte = ["m : ", m_cal];
+% disp(texte);
+% texte = ["b : ", b_cal];
+% disp(texte);
+% texte = ["P_0 : ", p0];
+% disp(texte);
+% texte = ["h_s : ", hs];
+% disp(texte);
+% texte = ["Valeur de R^2 Identification : ", R_2_iden];
+% disp(texte);
+% 
+% disp("---------------- LIMITES STRUCTUREL ----------------");
+% disp("Gamma")
+% texte = ["Gamma avec 250m/s : ", Gamma_ref(1)];
+% disp(texte);
+% texte = ["Gamma avec 300m/s : ", Gamma_ref(2)];
+% disp(texte);
+% disp("P_dyn");
+% texte = ["P_dyn max avec 250m/s : ", max(P_dyn_cal(:,1))];
+% disp(texte);
+% texte = ["P_dyn max avec 300m/s : ", max(P_dyn_cal(:,2))];
+% disp(texte);
+% 
+% disp("Newton-Raphson pour indice gamma = (1 = 250m/s)(2 = 300m/s)");
+% disp(indice_gamma);
+% 
+% texte = ["h min avec indice_gamma : ", h_min];
+% disp(texte);
+% texte = ["v min avec indice_gamma : ", v_min];
+% disp(texte);
+% texte = ["h_depart avec indice_gamma : ", h_dep(2)];
+% disp(texte);
+% texte = ["Iteration avec indice_gamma : ", Val(2,1)];
+% disp(texte);
+% 
+% texte = ["h max avec indice_gamma : ", h_max];
+% disp(texte);
+% texte = ["v max avec indice_gamma : ", v_max];
+% disp(texte);
+% texte = ["h_depart avec indice_gamma : ", h_dep(1)];
+% disp(texte);
+% texte = ["Iteration avec indice_gamma : ", Val(1,1)];
+% disp(texte);
+% 
+% texte = ["Delta_t avec indice_gamma : ", Delta_t];
+% disp(texte);
 
 
 
@@ -399,29 +403,29 @@ disp(texte);
 
 
 
-% figure
-% plot(t_dyn, z_dyn(:,1))
-% title("Vitesse")
-% 
-% figure
-% plot(t_dyn, z_dyn(:,2))
-% title("Gamma")
-% 
-% figure
-% plot(t_dyn, z_dyn(:,3))
-% title("Hauteur")
-% 
-% figure
-% plot(t_dyn, z_dyn(:,4))
-% title("s")
-% 
-% figure
-% plot(t_dyn, z_dyn(:,5))
-% title("Theta")
-% 
-% figure
-% plot(t_dyn, z_dyn(:,6))
-% title("q")
+figure
+plot(t_dyn, z_dyn(:,1))
+title("Vitesse")
+
+figure
+plot(t_dyn, z_dyn(:,2))
+title("Gamma")
+
+figure
+plot(t_dyn, z_dyn(:,3))
+title("Hauteur")
+
+figure
+plot(t_dyn, z_dyn(:,4))
+title("s")
+
+figure
+plot(t_dyn, z_dyn(:,5))
+title("Theta")
+
+figure
+plot(t_dyn, z_dyn(:,6))
+title("q")
 
 
 disp("Hello World")
