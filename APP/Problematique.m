@@ -245,80 +245,105 @@ K_d_rot = 2*Zeta_rot*Omega_rot;
 %Sortir les variables nécessaires pour le code
 save variables.mat p0 R_mars U_mars hs V_fin p_fin indice_gamma B S C_Lalpha m K_p_trans C_Malpha d J C_Mq K_p_rot K_d_rot C_Mdelta C_D0 Asservissement h_fin
 
-tspan = [0 200];
+tspan = [0 300];
 reltol2 = 1e-10;
 options = odeset('abstol', 1e-06, 'reltol', reltol2);
 [func_t, func_z] = ode45('commande', tspan, z0, options);
 
 index = find(func_z(:,3) <= h_fin);
 
-P_dyn_max_Valid = max((0.5) * (p0*exp(-func_z(:,3)./hs)) .* (func_z(:,1).^2));
-delta_t_max_Valid = max(func_z(:,7));
+
+%Valeur nécessaire après la sortie de Valid
+%P_dyn
+P_dyn_Valid = (0.5) * (p0*exp(-func_z(:,3)./hs)) .* (func_z(:,1).^2);
+P_dyn_max_Valid = max(P_dyn_Valid);
+%Gamma ref
+func_p_Valid = p0 * exp((-func_z(:,3))./hs);
+Delta_V_Aero_Valid = V_fin(indice_gamma) - sqrt((func_z(:,1).^2)+(2*U_mars.*((1/(R_mars+h_fin))-(1./(R_mars+func_z(:,3))))));
+Gamma_ref_Valid = asin((0.5)*B*hs*((p_fin - func_p_Valid)./(log(1 + (Delta_V_Aero_Valid./func_z(:,1))))));
+%D_aero
+D_aero_Valid = P_dyn_Valid*(S*C_D0);
+%Delta_t
+Delta_t_Valid = func_z(:,7);
+%Alpha
+Alpha_Valid = func_z(:,5) - func_z(:,2);
 
 
 %% Texte
 % disp("---------------- INTEGRATION ----------------");
-texte = ["Erreur Intégration Vitesse : ", Vitesse.Erreur];
-disp(texte);
-texte = ["Erreur Intégration Position : ", Position.Erreur];
-disp(texte);
-
-disp("---------------- ACCELERATION ----------------");
-texte = ["Valeur de RMS_abs accélération : ", RMS_abs_acc];
-disp(texte);
-texte = ["Valeur de RMS_rel accélération : ", RMS_rel_acc];
-disp(texte);
-texte = ["Valeur de R^2 accélération : ", R_2_acc];
-disp(texte);
-
-disp("---------------- IDENTIFICATION ----------------");
-texte = ["m : ", m_cal];
-disp(texte);
-texte = ["b : ", b_cal];
-disp(texte);
-texte = ["P_0 : ", p0];
-disp(texte);
-texte = ["h_s : ", hs];
-disp(texte);
-texte = ["Valeur de R^2 Identification : ", R_2_iden];
-disp(texte);
-
-disp("---------------- LIMITES STRUCTUREL ----------------");
-disp("Gamma")
-texte = ["Gamma avec 250m/s : ", Gamma_ref(1)];
-disp(texte);
-texte = ["Gamma avec 300m/s : ", Gamma_ref(2)];
-disp(texte);
-disp("P_dyn");
-texte = ["P_dyn max avec 250m/s : ", max(P_dyn_cal(:,1))];
-disp(texte);
-texte = ["P_dyn max avec 300m/s : ", max(P_dyn_cal(:,2))];
-disp(texte);
-
-disp("Newton-Raphson pour indice gamma = (1 = 250m/s)(2 = 300m/s)");
-disp(indice_gamma);
-
-texte = ["h min avec indice_gamma : ", h_min];
-disp(texte);
-texte = ["v min avec indice_gamma : ", v_min];
-disp(texte);
-texte = ["h_depart avec indice_gamma : ", h_dep(2)];
-disp(texte);
-texte = ["Iteration avec indice_gamma : ", Val(2,1)];
-disp(texte);
-
-texte = ["h max avec indice_gamma : ", h_max];
-disp(texte);
-texte = ["v max avec indice_gamma : ", v_max];
-disp(texte);
-texte = ["h_depart avec indice_gamma : ", h_dep(1)];
-disp(texte);
-texte = ["Iteration avec indice_gamma : ", Val(1,1)];
-disp(texte);
-
-texte = ["Delta_t avec indice_gamma : ", Delta_t];
-disp(texte);
-
+% texte = ["Erreur Intégration Vitesse : ", Vitesse.Erreur];
+% disp(texte);
+% texte = ["Erreur Intégration Position : ", Position.Erreur];
+% disp(texte);
+% 
+% disp("---------------- ACCELERATION ----------------");
+% texte = ["Valeur de RMS_abs accélération : ", RMS_abs_acc];
+% disp(texte);
+% texte = ["Valeur de RMS_rel accélération : ", RMS_rel_acc];
+% disp(texte);
+% texte = ["Valeur de R^2 accélération : ", R_2_acc];
+% disp(texte);
+% 
+% disp("---------------- IDENTIFICATION ----------------");
+% texte = ["m : ", m_cal];
+% disp(texte);
+% texte = ["b : ", b_cal];
+% disp(texte);
+% texte = ["P_0 : ", p0];
+% disp(texte);
+% texte = ["h_s : ", hs];
+% disp(texte);
+% texte = ["Valeur de R^2 Identification : ", R_2_iden];
+% disp(texte);
+% 
+% disp("---------------- LIMITES STRUCTUREL ----------------");
+% disp("Gamma")
+% texte = ["Gamma avec 250m/s : ", Gamma_ref(1)];
+% disp(texte);
+% texte = ["Gamma avec 300m/s : ", Gamma_ref(2)];
+% disp(texte);
+% disp("P_dyn");
+% texte = ["P_dyn max avec 250m/s : ", max(P_dyn_cal(:,1))];
+% disp(texte);
+% texte = ["P_dyn max avec 300m/s : ", max(P_dyn_cal(:,2))];
+% disp(texte);
+% 
+% disp("Newton-Raphson pour indice gamma = (1 = 250m/s)(2 = 300m/s)");
+% disp(indice_gamma);
+% 
+% texte = ["h min avec indice_gamma : ", h_min];
+% disp(texte);
+% texte = ["v min avec indice_gamma : ", v_min];
+% disp(texte);
+% texte = ["h_depart avec indice_gamma : ", h_dep(2)];
+% disp(texte);
+% texte = ["Iteration avec indice_gamma : ", Val(2,1)];
+% disp(texte);
+% 
+% texte = ["h max avec indice_gamma : ", h_max];
+% disp(texte);
+% texte = ["v max avec indice_gamma : ", v_max];
+% disp(texte);
+% texte = ["h_depart avec indice_gamma : ", h_dep(1)];
+% disp(texte);
+% texte = ["Iteration avec indice_gamma : ", Val(1,1)];
+% disp(texte);
+% 
+% texte = ["Delta_t avec indice_gamma : ", Delta_t];
+% disp(texte);
+% 
+% disp("---------------- VALID ----------------");
+% disp("Asservissement -> 1=on 2=off")
+% Asservissement
+% disp("V_ini -> 1=250 2=300 ")
+% indice_gamma
+% 
+% texte = ["V_finale : ", func_z(index(1),1)];
+% disp(texte);
+% texte = ["Delta_t : ", max(func_z(:,7))];
+% disp(texte);
+% texte = ["P_dyn_max : ", P_dyn_max_Valid];
+% disp(texte);
 
 
 %% Graphiques
@@ -349,6 +374,7 @@ disp(texte);
 % legend(["Mesurer"])
 
 % -------------------- RAA -------------------------
+
 %Graphique Vitesse calculer par RAA
 % figure
 % hold on
@@ -372,6 +398,7 @@ disp(texte);
 % legend(["Mesurer" "Approximer"])
 
 % -------------------- Limitation Structurel -------------------------
+
 %Graphique Vitesse avec les limitations structurel
 % figure
 % hold on
@@ -400,30 +427,118 @@ disp(texte);
 % title("D_a_e_r_o calculé par RAA")
 % legend(["250m/s" "300m/s" "D_a_e_r_o max"])
 
-%Graphique 
-figure
-plot(func_t(1:index(1),1), func_z(1:index(1),1))
-title("Vitesse")
+% -------------------- Validation -------------------------
 
-figure
-plot(func_t(1:index(1)), func_z(1:index(1),2))
-title("Gamma")
-
-figure
-plot(func_t(1:index(1)), func_z(1:index(1),3))
-title("Hauteur")
-
-figure
-plot(func_t(1:index(1)), func_z(1:index(1),4))
-title("s")
-
-figure
-plot(func_t(1:index(1)), func_z(1:index(1),5))
-title("Theta")
-
-figure
-plot(func_t(1:index(1)), func_z(1:index(1),6))
-title("q")
+%Graphique des asservissements
+% figure;
+% hold on
+% grid on
+% plot((func_z(1:index(1),3)/1000), func_z(1:index(1),1));
+% xlabel("Hauteur (km)");
+% ylabel("Vitesse (m/s)");
+% legend(["Vitesse"])
+% title("Vitesse en fonction de la hauteur");
+% 
+% figure;
+% hold on
+% grid on
+% plot((func_t(1:index(1))), func_z(1:index(1),1));
+% xlabel("Temps (s)");
+% ylabel("Vitesse (m/s)");
+% legend(["Vitesse"])
+% title("Vitesse en fonction du temps");
+% 
+% if Asservissement == 1
+    % figure;
+    % hold on
+    % grid on
+    % plot(func_t(1:index(1)), rad2deg(func_z(1:index(1),2)));
+    % plot(func_t(1:index(1)), rad2deg(Gamma_ref_Valid(1:index(1))))
+    % % plot(func_t(1:index(1)), Gamma_ref(indice_gamma)*ones(index(1),1), "black")
+    % % legend(["\gamma" "\gamma_r_e_f" "\gamma_r_e_f initial"])
+    % legend(["\gamma" "\gamma_r_e_f"])
+    % xlabel("Temps (s)");
+    % ylabel("Angle (deg)");
+    % ylim([-25 -10])
+    % title("Gamma en fonction du temps");
+% 
+%     figure;
+%     hold on
+%     grid on
+%     plot(func_z(1:index(1),3)/1000, rad2deg(func_z(1:index(1),2)));
+%     legend(["\gamma"])
+%     xlabel("Hauteur (km)");
+%     ylabel("Angle (deg)");
+%     title("Gamma en fonction de hauteur");
+% else
+%     figure;
+%     hold on
+%     grid on
+%     plot(func_t(1:index(1)), rad2deg(func_z(1:index(1),2)));
+%     legend(["\gamma"]);
+%     xlabel("Temps (s)");
+%     ylabel("Angle (deg)");
+%     title("Gamma en fonction du temps");
+% end
+% 
+% figure;
+% hold on
+% grid on
+% plot(func_t(1:index(1)), func_z(1:index(1),3)/1000);
+% xlabel("Temps (s)");
+% ylabel("Hauteur (km)");
+% legend(["Hauteur"]);
+% title("Hauteur en fonction du temps");
+% 
+% figure;
+% hold on
+% grid on
+% plot(func_t(1:index(1)), rad2deg(func_z(1:index(1),5)));
+% plot(func_t(1:index(1)), rad2deg(Alpha_Valid(1:index(1))));
+% xlabel("Temps (s)");
+% ylabel("Angle (deg)");
+% legend(["\Theta" "\alpha"]);
+% title("Theta et Alpha");
+% 
+% if Asservissement == 1
+%     figure;
+%     hold on
+%     grid on
+%     plot(func_t(1:index(1)), rad2deg(func_z(1:index(1),6)));
+%     xlabel("Temps (s)");
+%     ylabel("Angle (deg)");
+%     legend(["q"]);
+%     title("q");
+% else
+%     figure;
+%     hold on
+%     grid on
+%     plot(func_t(1:index(1)), rad2deg(func_z(1:index(1),6)));
+%     xlabel("Temps (s)");
+%     ylabel("Angle (deg)");
+%     ylim([-5 5])
+%     legend(["q"]);
+%     title("q");
+% end
+% 
+% figure;
+% hold on
+% grid on
+% plot(func_t(1:index(1)), P_dyn_Valid(1:index(1)));
+% plot(func_t(1:index(1)), D_aero_Valid(1:index(1)));
+% xlabel("Temps (s)");
+% ylabel("Amplitude");
+% legend(["P_d_y_n" "D_a_e_r_o"]);
+% title("D_a_e_r_o et P_d_y_n");
+% 
+% figure;
+% hold on;
+% grid on;
+% plot(func_t(1:index(1)), Delta_t_Valid(1:index(1)));
+% ylabel("Temps dépassement (s)");
+% xlabel("Temps chute (s)")
+% title("Delta temps")
+% legend(["\Delta t"])
 
 
 disp("Hello World")
