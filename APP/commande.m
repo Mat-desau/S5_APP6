@@ -1,6 +1,6 @@
     function f = commande(t,z)
     
-    %z = [v_ini, Gamma_ini, h_ini, s_ini, Theta_ini, q_ini]
+    %z = [v_ini, Gamma_ini, h_ini, s_ini, Theta_ini, q_ini, Delta_t]
     %
 
     load("variables.mat")
@@ -45,11 +45,7 @@
     %Calcul de theta commande
     func_Theta_cmd = (temp1_1-temp2_1+temp3_1)/(temp4_1);
 
-    if Asservissement == 1
-        func_Gamma_point = (1/func_v) * ((func_L_aero/m)+(((func_v^2)/func_r)-func_g)*cos(func_Gamma));
-    else
-        func_Gamma_point = (1/func_v) * ((func_L_aero/m)+(((func_v^2)/func_r)-func_g)*cos(func_Gamma));
-    end
+    func_Gamma_point = (1/func_v) * ((func_L_aero/m)+(((func_v^2)/func_r)-func_g)*cos(func_Gamma));
 
     %Ajustement de theta commande
     if func_Theta_cmd <= deg2rad(-60)
@@ -81,6 +77,7 @@
     f(4) = (func_v/func_r) * cos(func_Gamma);
     f(5) = func_q;
     f(6) = func_q_point;
+    f(7) = func_D_aero > 2650;
 
     f = f(:);
 end
