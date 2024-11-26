@@ -121,9 +121,9 @@ R_2_iden = (sum((Y_appro - y_).^2) ./ sum((Y - y_) .^2));
 clear y_ N
 
 %Calcul des erreurs
-N = length(acc_mes);
-y_ = (1/N) * sum(acc_mes);
-R_2_acc = (sum((acc_appro-y_).^2) ./ sum((acc_mes - y_) .^2));
+N = length(Y);
+y_ = (1/N) * sum(Y);
+R_2_acc = (sum((Y_appro-y_).^2) ./ sum((Y - y_) .^2));
 clear y_ N
 
 N = length(acc_appro);
@@ -378,10 +378,10 @@ Alpha_Valid = func_z(:,5) - func_z(:,2);
 %Graphique Vitesse calculer par RAA
 % figure
 % hold on
-% scatter(t, vit_mes, "blue", 'filled')
-% plot(t_28, vit_appro, "red")
+% scatter(h_mes, vit_mes(1:2:end), "blue", 'filled')
+% plot(h_mes, vit_appro, "red")
 % grid on
-% xlabel("Temps(s)")
+% xlabel("Hauteur (m)")
 % ylabel("Vitesse (m/s)")
 % title("Vitesse calculé par RAA")
 % legend(["Mesurer" "Approximer"])
@@ -389,10 +389,10 @@ Alpha_Valid = func_z(:,5) - func_z(:,2);
 %Graphique Accélération calculé par RAA
 % figure
 % hold on
-% scatter(t, acc_mes, "blue", 'filled')
-% plot(t_28, acc_appro_vit_appro, "red")
+% scatter(h_mes, acc_mes(1:2:end), "blue", 'filled')
+% plot(h_mes, acc_appro_vit_appro, "red")
 % grid on
-% xlabel("Temps(s)")
+% xlabel("Hauteur (m)")
 % ylabel("Accélération (m/s^2)")
 % title("Accélération calculé par RAA")
 % legend(["Mesurer" "Approximer"])
@@ -500,26 +500,27 @@ Alpha_Valid = func_z(:,5) - func_z(:,2);
 % legend(["\Theta" "\alpha"]);
 % title("Theta et Alpha");
 % 
-% if Asservissement == 1
-%     figure;
-%     hold on
-%     grid on
-%     plot(func_t(1:index(1)), rad2deg(func_z(1:index(1),6)));
-%     xlabel("Temps (s)");
-%     ylabel("Angle (deg)");
-%     legend(["q"]);
-%     title("q");
-% else
-%     figure;
-%     hold on
-%     grid on
-%     plot(func_t(1:index(1)), rad2deg(func_z(1:index(1),6)));
-%     xlabel("Temps (s)");
-%     ylabel("Angle (deg)");
-%     ylim([-5 5])
-%     legend(["q"]);
-%     title("q");
-% end
+if Asservissement == 1
+    figure;
+    hold on
+    grid on
+    plot(func_t(1:index(1)), rad2deg(func_z(1:index(1),6)));
+    xlabel("Temps (s)");
+    ylim([-5 5])
+    ylabel("Angle (deg)");
+    legend(["q"]);
+    title("q");
+else
+    figure;
+    hold on
+    grid on
+    plot(func_t(1:index(1)), rad2deg(func_z(1:index(1),6)));
+    xlabel("Temps (s)");
+    ylabel("Angle (deg)");
+    ylim([-5 5])
+    legend(["q"]);
+    title("q");
+end
 % 
 % figure;
 % hold on
