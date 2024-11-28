@@ -123,7 +123,7 @@ clear y_ N
 %Calcul des erreurs
 N = length(Y);
 y_ = (1/N) * sum(Y);
-R_2_acc = (sum((Y_appro-y_).^2) ./ sum((Y - y_) .^2));
+R_2_acc = (sum((Y_appro-y_).^2) ./ sum((Y - y_) .^2))
 clear y_ N
 
 N = length(acc_appro);
