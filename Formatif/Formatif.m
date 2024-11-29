@@ -87,7 +87,7 @@ for n = 1:50
 end
 
 
-%% Problème 3
+%% Problème 4
 clc 
 close all
 clear all
